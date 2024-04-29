@@ -3,8 +3,11 @@ import './Header.css';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Link } from 'react-router-dom';
+import { useStateValue } from './StateProvider';
 
 export const Header = () => {
+    const [state,dispatch] =useStateValue();
+
   return (
     <div className='header'>
         <Link to="/">
@@ -20,6 +23,7 @@ export const Header = () => {
         </div>
 
         <div className="header-nav">
+            <Link to="/login">
             <div className='header-option'>
                 <span className='header-optionLineone'>
                     Hello, Guest
@@ -28,6 +32,7 @@ export const Header = () => {
                     Sign in
                 </span>
             </div>
+            </Link>
 
             <div className='header-option'>
                 <span className='header-optionLineone'>
@@ -51,7 +56,7 @@ export const Header = () => {
             <div className='header-optionBasket'>
                 <ShoppingCartIcon/>
                 <span className='header-optionLinetwo header-basketIcon'>
-                    0
+                    {state.basket.length}
                 </span>
             </div>
             </Link>

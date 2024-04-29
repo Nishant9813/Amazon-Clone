@@ -1,8 +1,15 @@
 .cartcheckout{
     display: flex;
     padding: 20px;
+    margin: 20px;
     background-color: white;
     height: max-content;
+}
+.checkout-left{
+    margin: 20px;
+}
+.checkout-right{
+    padding: 25px;
 }
 .checkout-ad{
     height: 250px;
