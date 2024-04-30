@@ -1,5 +1,6 @@
 export const intialState ={
     basket: [],
+    user : null,
 };
 
 const reducer = (state,action)=>{
@@ -13,6 +14,11 @@ const reducer = (state,action)=>{
             return{
                 ...state,
                 basket: state.basket.filter(item => item.id !== action.id)
+            }
+        case 'SET_USER':
+            return {
+                ...state,
+                user : action.user
             }
     }
 }

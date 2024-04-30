@@ -6,13 +6,15 @@ import { useStateValue } from './StateProvider';
 import { CartProduct } from './CartProduct';
 
 export const Cart = () => {
-  const [{ basket }] = useStateValue();
+  const [{ basket ,user},dispatch] = useStateValue();
 
   return (
     <div className="cartcheckout">
       <div className="checkout-left">
+        
         <img className='checkout-ad' src='https://images.fonearena.com/blog/wp-content/uploads/2023/07/Amazon-Prime-Day-Laptop-Offers-and-Deals-1024x325.png'/>
-        <div className="checkout-title">
+        <h3>Hello, {user?.email}</h3>
+        <h2 className="checkout-title">Your Shopping cart</h2>
           {/* Use map to render each product in the basket */}
           {basket.map((element) => (
             <CartProduct
@@ -24,7 +26,7 @@ export const Cart = () => {
               imgLink={element.imgLink}
             />
           ))}
-        </div>
+        
       </div>
       <div className="checkout-right">
         <Subtotal/>
