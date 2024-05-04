@@ -11,6 +11,7 @@ import { useStateValue } from './Components/StateProvider';
 //Stripe
 import {loadStripe} from '@stripe/stripe-js'
 import {Elements} from '@stripe/react-stripe-js'
+import { Orders } from './Components/Orders';
 const promise = loadStripe("pk_test_51PC1vXSE5sOS3vsWlnTq6IcVQ5054OWIw3ipApT7D01Z8bcIZzzCdCC7OwTlfxVu5gir8B7pXXhq6Q0aBZnOrokP00KtsYpUxR");
 function App() {
   const [{},dispatch] = useStateValue();
@@ -40,6 +41,7 @@ function App() {
           <Route path='/cart' element={<HeaderWithCart />} />
           <Route path='/payment' element={<HeaderWithPayment />} />
           <Route path='/login' element={<Login />} />
+          <Route path='/orders' element={<Orders />} />
         </Routes>
       </div>
     </Router>

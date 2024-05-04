@@ -2,59 +2,96 @@ import React, { useEffect, useState } from "react";
 import "./Payment.css";
 import { useStateValue } from "./StateProvider";
 import { CartProduct } from "./CartProduct";
-import { Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { NumericFormat } from "react-number-format";
 
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
-import axios from './Axios'
+import axios from "./Axios";
+
+import { db, collection, doc, setDoc } from "../firebase";
 
 export const Payment = () => {
   const [{ basket, user }, dispatch] = useStateValue();
 
   const [error, setError] = useState(null);
   const [disabled, setDisabled] = useState(true);
-  const [succeeded,setSucceeded] = useState(false);
-  const [processing,setProcessing] = useState("");
-  const [clientScreat,setClientScreat] = useState(true);
+  const [succeeded, setSucceeded] = useState(false);
+  const [processing, setProcessing] = useState("");
+  const [clientScreat, setClientScreat] = useState(true);
 
   const navigate = useNavigate();
 
-  useEffect(()=>{
-    const getclientScreat= async ()=>{
-        const respone = await axios({
-          method : 'post',
-          url : `/payment/create?total=${totalprice *100}`
-        })
-        setClientScreat(respone.data.clientScreat)
-    }
+  useEffect(() => {
+    const getclientScreat = async () => {
+      const respone = await axios({
+        method: "post",
+        url: `/payment/create?total=${totalPriceInCents}`,
+      });
+      setClientScreat(respone.data.clientScreat);
+    };
     getclientScreat();
-  },[basket])
+  }, [basket]);
+
+  console.log("This is client secrete", clientScreat);
 
   const stripe = useStripe();
   const element = useElements();
-  let totalprice = 0;
+  let totalPrice = 0;
   basket.forEach((item) => {
-    totalprice += item.price;
+    totalPrice += item.price;
   });
 
-  const handleSubmit =async (e) => {
+  // Convert total price to cents (required by Stripe)
+  const totalPriceInCents = totalPrice * 100;
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setProcessing(true);
 
-    const payload  = await stripe.confirmCardPayment(clientScreat,{
-      payment_method:{
-        card : element.getElement(CardElement)
-      }
-    }).then(({pyamentIntent})=>{
-      setSucceeded(true);
-      setError(false);
-      setProcessing(false);
-       
-      navigate('/orders');
-    })
+    const payload = await stripe.confirmCardPayment(clientScreat, {
+      payment_method: {
+        card: element.getElement(CardElement),
+      },
+    });
 
+    if (payload.error) {
+      setError(`Payment failed: ${payload.error.message}`);
+      setProcessing(false);
+    } else {
+      try {
+        await saveOrderToFirestore(payload.paymentIntent, user, basket);
+        setSucceeded(true);
+        setError(null);
+        setProcessing(false);
+        dispatch({ type: "EMPTY_BASKET" });
+        navigate("/orders");
+      } catch (error) {
+        setError(`Error saving order: ${error.message}`);
+        setProcessing(false);
+      }
+    }
+  };
+
+  const saveOrderToFirestore = async (paymentIntent, user, basket) => {
+    console.log("User:", user);
+    console.log("Basket:", basket);
+
+    const orderRefPath = ["users", user?.uid, "orders", paymentIntent.id];
+    console.log("OrderRefPath:", orderRefPath);
+
+    const orderRef = doc(collection(db, ...orderRefPath));
+
+    try {
+      await setDoc(orderRef, {
+        basket: basket,
+        amount: paymentIntent.amount,
+        created: paymentIntent.created,
+      });
+      console.log("Order successfully saved to Firestore!");
+    } catch (error) {
+      console.error("Error saving order to Firestore:", error);
+    }
   };
 
   const handleChange = (e) => {
@@ -112,7 +149,7 @@ export const Payment = () => {
                 <NumericFormat
                   renderText={() => (
                     <>
-                      <h3>Order Total: {totalprice}</h3>
+                      <h3>Order Total: {totalPrice}</h3>
                     </>
                   )}
                   decimalScale={2}
