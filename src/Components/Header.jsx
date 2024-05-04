@@ -34,7 +34,7 @@ export const Header = () => {
             <Link to={!user && "/login"}>
             <div className='header-option' onClick={handleAuthentication}>
                 <span className='header-optionLineone'>
-                    Hello, Guest
+                    Hello,{user ? user.email : "Guest" }
                 </span>
                 <span className='header-optionLinetwo'>
                    {/* { user ? user.email: 'sign In' } */}

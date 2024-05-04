@@ -32,7 +32,7 @@ export const Login = () => {
         toast.success("Login Successfully");
         setTimeout(() => {
           navigate("/");
-        }, 2000);
+        }, 1500);
       })
       .catch(error => {
         const errorMessage = error.message;
