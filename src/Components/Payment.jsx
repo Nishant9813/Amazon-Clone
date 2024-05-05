@@ -164,6 +164,7 @@ export const Payment = () => {
               </div>
 
               {/* error */}
+              {console.log(error)}
               {error && <div>error</div>}
             </form>
           </div>
