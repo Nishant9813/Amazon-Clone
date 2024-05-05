@@ -42,6 +42,7 @@ function App() {
           <Route path='/payment' element={<HeaderWithPayment />} />
           <Route path='/login' element={<Login />} />
           <Route path='/orders' element={<Orders />} />
+          <Route path='*' element={<HeaderWithHome/>}/>
         </Routes>
       </div>
     </Router>
